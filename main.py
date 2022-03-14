@@ -12,7 +12,7 @@ laser = sensors.LaserSensor(170, uncertainty=(0.5, 0.01))
 
 env.infomap = env.map.copy()
 
-start = (790, 730)
+start = (880, 730)
 robot = environment.Robot(start, 0.01 * 3779.52)
 
 sensor_range = 300, math.radians(35)
@@ -33,10 +33,9 @@ while running:
         position = (robot.x, robot.y)
         laser.position = position
         sensor_data = laser.sense_obtacles()    # track boundaries
-        #env.dataStorage(sensor_data)
-        #env.show_sensorData(sensor_data)
-        #laser.show_sensorData()
-        if env.trail_set.__sizeof__() > 13000:
+
+        robot.lap(robot.x, robot.y)
+        if robot.lapcount > 1:
             sensorOn = False
     
     dt = (pygame.time.get_ticks() - last_time) / 1000
@@ -50,8 +49,7 @@ while running:
     robot.kinematics(dt)
     env.draw_robot(robot.x, robot.y, robot.heading)
     env.trail((robot.x, robot.y), sensorOn)
-    #if robot.lapcount > 0:
-        #env.show_sensorData()
+
     point_cloud = ultra_sonic.sense_obstacles(robot.x, robot.y, robot.heading)
     robot.avoid_obstacles(point_cloud)
     env.draw_sensor_data(point_cloud[0], 0)

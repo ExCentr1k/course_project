@@ -34,12 +34,6 @@ class buildEnvironment:
         y = -distance * math.sin(angle) + carPosition[1]
         return(int(x), int(y))
 
-    def dataStorage(self, data):
-        for element in data:
-            point = self.Ad2pos(element[0], element[1], element[2])
-            if point not in self.pointCloud:
-                self.pointCloud.append(point)
-
     def show_sensorData(self, pointCloud_lidar):
         self.infomap = self.map.copy()
         for point in pointCloud_lidar[0]:
@@ -54,16 +48,16 @@ class buildEnvironment:
 
     def draw_boundaries(self, pointCloud_lidar):
         #self.infomap = self.map.copy()
-        for i in range(0, len(pointCloud_lidar[0]) - 1, 8):
+        for i in range(0, len(pointCloud_lidar[0]) - 1, 6):
             if self.threshold_min < self.line_check(pointCloud_lidar[0][i],
                     pointCloud_lidar[0][i+1]) < self.threshold_max:
                 pygame.draw.line(self.map, (255, 128, 0), pointCloud_lidar[0][i],
                     pointCloud_lidar[0][i+1], 1)
-        for i in range(0, len(pointCloud_lidar[1]) - 1, 8):
+        for i in range(0, len(pointCloud_lidar[1]) - 1, 6):
             if self.threshold_min < self.line_check(pointCloud_lidar[1][i],
                     pointCloud_lidar[1][i+1]) < self.threshold_max:
                 pygame.draw.line(self.map, (0, 255, 255), pointCloud_lidar[1][i],
-                    pointCloud_lidar[1][i+1], 1)            
+                    pointCloud_lidar[1][i+1], 1)
         
 
     def draw_robot(self, x, y, heading):
@@ -121,7 +115,6 @@ class Robot:
         self.min_obs_dist = 50
         self.count_down = 5
 
-
     def avoid_obstacles(self, point_cloud):
         closest_obs_r = (point_cloud[0], 500)
         dist = np.inf
@@ -149,7 +142,6 @@ class Robot:
             #print('right ' + str(closest_obs_r[1]))
             self.turn_left()     
 
-
     def turn_right(self):
         self.vr = self.minspeed / 4
         self.vl = self.minspeed 
@@ -163,7 +155,6 @@ class Robot:
         self.vl = self.minspeed
 
     def kinematics(self, dt):
-
         self.x += ((self.vl + self.vr)/2) * math.cos(self.heading) * dt
         self.y -= ((self.vl + self.vr)/2) * math.sin(self.heading) * dt
         self.heading += (self.vr - self.vl) / self.w * dt
@@ -171,18 +162,19 @@ class Robot:
         if self.heading > 2 * math.pi or self.heading < -2 * math.pi:
             self.heading = 0
 
-    def lap(self):
-        if self.x <= 831 and self.x >= 827  and self.y > 687 and self.y < 782:
+    def lap(self, x, y):
+        if x <= 853 and x >= 851  and y > 687 and y < 782:
             self.lapcount += 1
-            #self.min_obs_dist = 50 + self.lapcount * 5
+            print(x, y)
             print(self.lapcount)
-
 
 class Ultrasonic:
     def __init__(self, sensor_range, map):
         self.sensor_range = sensor_range
         self.map_width, self.map_height = pygame.display.get_surface().get_size()
         self.map = map
+        self.startfinishx = 0
+        self.startfinishy = 0
 
     def sense_obstacles(self, x, y, heading):
         obstacles = [], []
@@ -205,4 +197,8 @@ class Ultrasonic:
                     elif (color[0], color[1], color[2]) == (0, 0, 200):
                         obstacles[1].append([x, y])
                         break
+                    #elif (color[0], color[1], color[2]) == (163, 73, 164):
+                        #elf.startfinishx = x1
+                        #self.startfinishy = y1
+                        #break
         return obstacles

@@ -41,8 +41,8 @@ class LaserSensor:
         x1, y1 = self.position[0], self.position[1]
         for angle in np.linspace(0, math.pi * 2, 30, False):
             x2, y2 = (x1 + self.Range * math.cos(angle), y1 - self.Range * math.sin(angle))
-            for i in range(0, 100):
-                u = i / 100
+            for i in range(0, 50):
+                u = i / 50
                 x = int(x2 * u + x1 * (1 - u))
                 y = int(y2 * u + y1 * (1 - u))
                 if 0 < x < self.W and 0 < y < self.H:
